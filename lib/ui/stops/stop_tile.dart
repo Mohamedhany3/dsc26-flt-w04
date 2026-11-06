@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../domain/stop.dart';
 
-/// One stop row.
-///
-/// Works on a phone in English at normal text size, but has problems
-/// (see the README, Part B).
 class StopTile extends StatelessWidget {
   const StopTile({
     super.key,
@@ -20,51 +16,93 @@ class StopTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = switch (stop.status) {
-      StopStatus.pending => Colors.amber.shade700,
-      StopStatus.delivered => Colors.green.shade700,
-      StopStatus.failed => Colors.red.shade700,
+    final (color, status) = switch (stop.status) {
+      StopStatus.pending => (const Color(0xFFD97706), 'Pending'),
+      StopStatus.delivered => (const Color(0xFF0F9D78), 'Delivered'),
+      StopStatus.failed => (const Color(0xFFDC4545), 'Failed'),
     };
-    return SizedBox(
-      height: 64,
+
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: color.withValues(alpha: 0.18)),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Stack(
-          children: [
-            Positioned(
-              left: 12,
-              top: 26,
-              child: Container(
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
                 key: Key('stop-dot-${stop.id}'),
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 36, right: 48),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(stop.customerName,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(stop.address, maxLines: 1),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      stop.customerName,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF202938),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      stop.address,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF7B8492),
+                      ),
+                      softWrap: true,
+                    ),
+                    const SizedBox(height: 9),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        status,
+                        style: TextStyle(
+                          color: color,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Positioned(
-              right: 8,
-              top: 16,
-              child: IconButton(
+              const SizedBox(width: 6),
+              IconButton(
                 key: Key('call-${stop.id}'),
-                icon: const Icon(Icons.call, size: 18),
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints.tight(const Size(32, 32)),
+                tooltip: 'Call ${stop.customerName}',
                 onPressed: onCall,
+                constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                style: IconButton.styleFrom(
+                  backgroundColor: const Color(0xFFEAF5F1),
+                  foregroundColor: const Color(0xFF0F9D78),
+                ),
+                icon: const Icon(Icons.call_rounded),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
